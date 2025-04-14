@@ -9,31 +9,29 @@ const server = http.createServer(app);
 // Setup Socket.io on the server
 const io = socketIo(server);
 
-// Serve static files (if any)
-app.use(express.static('public'));
+// Serve a basic response for GET requests to the root
+app.get('/', (req, res) => {
+  res.send('Backend is running');
+});
 
-// Create a connection event for WebSocket
+// WebSocket logic
 io.on('connection', (socket) => {
   console.log('A user connected');
-
-  // Handle disconnect
+  
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
-  
+
   // Handle video chat signaling
   socket.on('offer', (offer) => {
-    console.log('Received offer: ', offer);
     socket.broadcast.emit('offer', offer); // Broadcast offer to other user
   });
 
   socket.on('answer', (answer) => {
-    console.log('Received answer: ', answer);
     socket.broadcast.emit('answer', answer); // Broadcast answer to other user
   });
 
   socket.on('candidate', (candidate) => {
-    console.log('Received candidate: ', candidate);
     socket.broadcast.emit('candidate', candidate); // Broadcast ICE candidate to other user
   });
 });
